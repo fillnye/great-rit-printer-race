@@ -2,6 +2,7 @@ import os
 
 from flask import render_template
 from flask import Flask
+from flask import request
 from enum import Enum
 import time
 import random
