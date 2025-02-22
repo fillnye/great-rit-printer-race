@@ -51,6 +51,7 @@ class Room:
         self.round = 0
         self.status = Status.STARTING
         self.winner = -1
+        self.timeleft = 0
 
     def mainLoop(self):
         while(self.status!=Status.FAULT):
@@ -58,14 +59,29 @@ class Room:
                 self.startRound()
             elif(self.status==Status.INTERROUND):
                 self.startRound()
+            elif(self.status==Status.INROUND):
+                self.timeleft = 600
+                for i in range(600):
+                    time.sleep(1)
+                    self.timeleft -= 1
+                    if(self.status==Status.END):
+                        continue
+                self.winner=-1
+                self.status=Status.END
             elif(self.status==Status.END):
-                time.sleep(30)
+                self.timeleft = 30
+                for i in range(30):
+                    time.sleep(1)
+                    self.timeleft -= 1
                 self.startRound()
             
     def startRound(self):
         if(len(self.users)<1):
             print("NOT ENOUGH USERS TO START")
-            time.sleep(10)
+            self.timeleft = 10
+            for i in range(10):
+                time.sleep(1)
+                self.timeleft -= 1
             return
         self.challengecode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         self.printcode()
@@ -103,6 +119,7 @@ def create_app(test_config=None):
             return "Succses"
         
         return render_template("user/register.html")
+        return render_template("user/register.html")
 
     @app.route('/user/view.html')
     def usrview():
@@ -130,7 +147,7 @@ def create_app(test_config=None):
     @app.route('/room/<int:roomid>/status')
     def roomstat(roomid):
         userjson = json.dumps(users, default=lambda o: o.__dict__)
-        data = {'users':userjson,'status':int(roomone.status.value), 'time':0 }
+        data = {'users':userjson,'status':int(roomone.status.value), 'time':roomone.timeleft }
         return data
 
     @app.route('/room/<int:roomid>/challenge', methods=['POST'])
