@@ -3,11 +3,14 @@ import os
 from flask import render_template
 from flask import Flask
 from flask import request
+from flask import Response
+from flask import redirect
 from enum import Enum
 import time
 import random
 import string
 import threading
+import json 
 
 #from pymongo.mongo_client import MongoClient
 #from pymongo.server_api import ServerApi
@@ -27,14 +30,17 @@ import threading
 class Status(Enum):
     STARTING = 0
     INROUND = 1
-    INTERROUND = 2
-    FAULT = 3
+    END = 2
+    INTERROUND = 3
+    FAULT = 4
 
 class User:
     def __init__(self, name, id, points):
         self.name = name
         self.id = id
         self.points = points
+    def toJSONN(self):
+        return {"name":self.name, "id":self.id, "points":self.points}
 
 
 class Room:
@@ -44,12 +50,16 @@ class Room:
         self.challengecode = "0"
         self.round = 0
         self.status = Status.STARTING
+        self.winner = -1
 
     def mainLoop(self):
         while(self.status!=Status.FAULT):
             if(self.status==Status.STARTING):
                 self.startRound()
             elif(self.status==Status.INTERROUND):
+                self.startRound()
+            elif(self.status==Status.END):
+                time.sleep(30)
                 self.startRound()
             
     def startRound(self):
@@ -64,8 +74,9 @@ class Room:
         print(self.challengecode)
     def challenge(self,challengecode,user):
         if(challengecode==self.challengecode):
-            self.status = Status.INTERROUND
+            self.status = Status.END
             user.points+=10
+            self.winner = user.id
             return True
         else:
             return False
@@ -97,23 +108,36 @@ def create_app(test_config=None):
     def usrview():
         return render_template("user/view.html")
 
-    @app.route('/room/join.html')
-    def joinroom():
-        return render_template("user/edit.html")
+    @app.route('/roomlist.html')
+    def roomlist():
+        return render_template("/roomlist.html")
 
     @app.route('/room/<int:roomid>')
     def room(roomid):
-        return render_template("user/edit.html")
+        if(roomone.status==Status.STARTING or roomone.status==Status.INTERROUND):
+            return render_template("/room/start.html")
+        elif(roomone.status==Status.INROUND):
+            return render_template("/room/room.html")
+        elif(roomone.status==Status.END):
+            return render_template("/room/end.html")
+        
+        return Response("Internal Server Error", status=500)
 
     @app.route('/room/<int:roomid>/status')
     def roomstat(roomid):
-        return 
+        userjson = json.dumps(users, default=lambda o: o.__dict__)
+        data = {'users':userjson,'status':int(roomone.status.value), 'time':0 }
+        return data
 
-    @app.route('/room/<int:roomid>/challenge>')
+    @app.route('/room/<int:roomid>/challenge', methods=['POST'])
     def roomchlg(roomid):
         if request.method == "POST":
-            return
-        return
+            if(('code' in request.form) and roomone.challenge(request.form['code'],roomone.users[0])):
+                return redirect('/room/'+str(roomid)) 
+            else:
+                return redirect('/room/'+str(roomid)+"?fail=true")
+                
+        return Response("Method Not Allowed", status=405, headers=[('Allow', 'POST')])
 
     app.add_url_rule("/", endpoint="index")
     return app
