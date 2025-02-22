@@ -54,7 +54,7 @@ class Room:
             
     def startRound(self):
         if(len(self.users)<1):
-            print("NOT ENOUGHT USERS TO START")
+            print("NOT ENOUGH USERS TO START")
             time.sleep(10)
             return
         self.challengecode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -95,11 +95,11 @@ def create_app(test_config=None):
 
     @app.route('/user/view.html')
     def usrview():
-        return render_template("user/view.html")
+        return render_template("user/view.html", user=users[0])
     
     @app.route('/user/edit.html')
     def usredit():
-        return render_template("user/edit.html")
+        return render_template("user/edit.html",user=users[0])
 
     @app.route('/room/join.html')
     def joinroom():

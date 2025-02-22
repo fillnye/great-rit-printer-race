@@ -1,1 +1,19 @@
-
+<!DOCTYPE html>
+<title>{% block title %}{% endblock %} - Great RIT Printer Race</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="header">
+    <h1>
+        Great RIT Printer Race - {% block header %}{% endblock %}
+    </h1>
+    <h2>
+      <a href="/user/view.html">View</a>
+      <a href="/user/edit.html">Edit</a>
+      <a href="/room/join.html">Rooms</a>
+    </h2>
+</div>
+<section class="content">
+    <header>
+      
+    </header>
+    {% block content %}{% endblock %}
+  </section>
