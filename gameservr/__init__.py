@@ -4,21 +4,23 @@ from flask import render_template
 from flask import Flask
 from enum import Enum
 import time
+import random
+import string
 
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
+#from pymongo.mongo_client import MongoClient
+#from pymongo.server_api import ServerApi
 
-uri = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
-
+#uri = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
+#
 # Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
-
+#client = MongoClient(uri, server_api=ServerApi('1'))
+#
 # Send a ping to confirm a successful connection
-try:
-    client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-except Exception as e:
-    print(e)
+#try:
+#    client.admin.command('ping')
+#    print("Pinged your deployment. You successfully connected to MongoDB!")
+#except Exception as e:
+#    print(e)
 
 class Status(Enum):
     STARTING = 0
@@ -27,10 +29,10 @@ class Status(Enum):
     FAULT = 3
 
 class User:
-    def __init__(self, users, age):
+    def __init__(self, name, id, points):
         self.name = name
-        self.id = age
-        self.points = 0
+        self.id = id
+        self.points = points
 
 
 class Room:
@@ -42,19 +44,19 @@ class Room:
         self.status = Status.STARTING
 
     def mainLoop(self):
-        while(self.status!=FAULT):
-            if(self.status==STARTING):
-                startRound(self)
-            elif(self.status==INTERROUND):
-                startRound(self)
+        while(self.status!=Status.FAULT):
+            if(self.status==Status.STARTING):
+                self.startRound()
+            elif(self.status==Status.INTERROUND):
+                self.startRound()
             
     def startRound(self):
         if(len(self.users)<1):
             print("NOT ENOUGHT USERS TO START")
-            time.sleep(40)
+            time.sleep(10)
             return
         self.challengecode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
-        printcode()
+        self.printcode()
         self.status = Status.INROUND
     def printcode(self):
         print(self.challengecode)
@@ -70,7 +72,9 @@ class Room:
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-
+    users=[User("Bob",32,500),User("Bob2",33,500),User("Bil",35,510)]
+    roomone = Room(users,0)
+    roomone.mainLoop()
     # a simple page that says hello
     @app.route('/index.html')
     def index():
@@ -82,7 +86,7 @@ def create_app(test_config=None):
             #Proccses reg data
             return "Succses"
         
-        return render_template("user/register.html")
+        return render_template("user/register.html",foo)
 
     @app.route('/user/view.html')
     def usrview():
@@ -100,7 +104,7 @@ def create_app(test_config=None):
     def roomstat(roomid):
         return 
 
-    @app.route('/room/<int:roomid/challenge>')
+    @app.route('/room/<int:roomid>/challenge>')
     def roomchlg(roomid):
         if request.method == "POST":
             return
