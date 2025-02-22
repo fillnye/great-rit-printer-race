@@ -91,19 +91,23 @@ def create_app(test_config=None):
             #Proccses reg data
             return "Succses"
         
-        return render_template("user/register.html",foo)
+        return render_template("user/register.html")
 
     @app.route('/user/view.html')
     def usrview():
         return render_template("user/view.html")
+    
+    @app.route('/user/edit.html')
+    def usredit():
+        return render_template("user/edit.html")
 
     @app.route('/room/join.html')
     def joinroom():
-        return render_template("user/edit.html")
+        return render_template("room/join.html")
 
     @app.route('/room/<int:roomid>')
     def room(roomid):
-        return render_template("user/edit.html")
+        return render_template("room/room.html")
 
     @app.route('/room/<int:roomid>/status')
     def roomstat(roomid):
