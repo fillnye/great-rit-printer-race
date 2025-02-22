@@ -6,6 +6,7 @@ from enum import Enum
 import time
 import random
 import string
+import threading
 
 #from pymongo.mongo_client import MongoClient
 #from pymongo.server_api import ServerApi
@@ -74,7 +75,10 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     users=[User("Bob",32,500),User("Bob2",33,500),User("Bil",35,510)]
     roomone = Room(users,0)
-    roomone.mainLoop()
+
+    gamethread = threading.Thread(target=roomone.mainLoop)
+
+    gamethread.start()
     # a simple page that says hello
     @app.route('/index.html')
     def index():
