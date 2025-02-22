@@ -1,1 +1,16 @@
-HELLLLLLOOOOO
+{% extends 'base.html' %}
+
+{% block header %}
+{% block title %}Home{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="indexbuttons">
+    <button id="register">
+        <a href="/user/register.html">Register</a>
+    </button>
+    <button id="login">
+        <a href="/user/login.html">Login</a>
+    </button>
+</div>
+{% endblock %}
