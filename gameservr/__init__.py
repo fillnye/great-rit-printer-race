@@ -5,12 +5,14 @@ from flask import Flask
 from flask import request
 from flask import Response
 from flask import redirect
+from flask import session
 from enum import Enum
 import time
 import random
 import string
 import threading
 import json 
+from flask_pymongo import PyMongo
 
 #from pymongo.mongo_client import MongoClient
 #from pymongo.server_api import ServerApi
@@ -51,6 +53,7 @@ class Room:
         self.round = 0
         self.status = Status.STARTING
         self.winner = -1
+        self.timeleft = 0
 
     def mainLoop(self):
         while(self.status!=Status.FAULT):
@@ -58,14 +61,29 @@ class Room:
                 self.startRound()
             elif(self.status==Status.INTERROUND):
                 self.startRound()
+            elif(self.status==Status.INROUND):
+                self.timeleft = 600
+                for i in range(600):
+                    time.sleep(1)
+                    self.timeleft -= 1
+                    if(self.status==Status.END):
+                        continue
+                self.winner=-1
+                self.status=Status.END
             elif(self.status==Status.END):
-                time.sleep(30)
+                self.timeleft = 30
+                for i in range(30):
+                    time.sleep(1)
+                    self.timeleft -= 1
                 self.startRound()
             
     def startRound(self):
         if(len(self.users)<1):
             print("NOT ENOUGH USERS TO START")
-            time.sleep(10)
+            self.timeleft = 10
+            for i in range(10):
+                time.sleep(1)
+                self.timeleft -= 1
             return
         self.challengecode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         self.printcode()
@@ -85,19 +103,38 @@ class Room:
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+    app.config["MONGO_URI"] = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
+    mongo = PyMongo(app)
     users=[User("Bob",32,500),User("Bob2",33,500),User("Bil",35,510)]
     roomone = Room(users,0)
 
     gamethread = threading.Thread(target=roomone.mainLoop)
 
     gamethread.start()
+
+    def userCheck():
+        if 'username' in session:
+            return f'Logged in as {session["username"]}'
+        return 'You are not logged in'
+
     # a simple page that says hello
     @app.route('/index.html')
     def index():
+        userCheck()
         return render_template("index.html")
-
-    @app.route('/user/register.html')
+    @app.route('/user/login', methods=['POST','GET'])
+    def login():
+        if request.method == "POST":
+            session['username'] = request.form['username']
+            return redirect("room/join.html")
+        return render_template("user/login.html")
+    @app.route('/user/logout')
+    def logout():
+        session.pop('username', None)
+    @app.route('/user/register', methods=['POST','GET'])
     def reg():
+        userCheck()
         if request.method == "POST":
             #Proccses reg data
             return "Succses"
@@ -106,18 +143,22 @@ def create_app(test_config=None):
 
     @app.route('/user/view.html')
     def usrview():
+        userCheck()
         return render_template("user/view.html", user=users[0])
     
     @app.route('/user/edit.html')
     def usredit():
+        userCheck()
         return render_template("user/edit.html",user=users[0])
 
     @app.route('/roomlist.html')
     def roomlist():
+        userCheck()
         return render_template("/roomlist.html")
 
     @app.route('/room/<int:roomid>')
     def room(roomid):
+        userCheck()
         if(roomone.status==Status.STARTING or roomone.status==Status.INTERROUND):
             return render_template("/room/start.html")
         elif(roomone.status==Status.INROUND):
@@ -130,7 +171,7 @@ def create_app(test_config=None):
     @app.route('/room/<int:roomid>/status')
     def roomstat(roomid):
         userjson = json.dumps(users, default=lambda o: o.__dict__)
-        data = {'users':userjson,'status':int(roomone.status.value), 'time':0 }
+        data = {'users':userjson,'status':int(roomone.status.value), 'time':roomone.timeleft }
         return data
 
     @app.route('/room/<int:roomid>/challenge', methods=['POST'])
