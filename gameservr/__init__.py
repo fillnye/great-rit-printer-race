@@ -11,23 +11,25 @@ import time
 import random
 import string
 import threading
-import json 
-#from flask_pymongo import PyMongo
+import json
 
-#from pymongo.mongo_client import MongoClient
-#from pymongo.server_api import ServerApi
 
-#uri = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
-#
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+uri = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
+
 # Create a new client and connect to the server
-#client = MongoClient(uri, server_api=ServerApi('1'))
-#
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+db = client.BrickHack11
+
 # Send a ping to confirm a successful connection
-#try:
-#    client.admin.command('ping')
-#    print("Pinged your deployment. You successfully connected to MongoDB!")
-#except Exception as e:
-#    print(e)
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 
 class Status(Enum):
     STARTING = 0
@@ -37,12 +39,11 @@ class Status(Enum):
     FAULT = 4
 
 class User:
-    def __init__(self, name, id, points):
+    def __init__(self, name, points):
         self.name = name
-        self.id = id
         self.points = points
     def toJSONN(self):
-        return {"name":self.name, "id":self.id, "points":self.points}
+        return {"name":self.name, "points":self.points}
 
 
 class Room:
@@ -108,55 +109,57 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-    #app.config["MONGO_URI"] = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
-    #mongo = PyMongo(app)
-    users=[User("Bob",32,500),User("Bob2",33,500),User("Bil",35,510)]
+    users = {}
     roomone = Room(users,0)
 
     gamethread = threading.Thread(target=roomone.mainLoop)
 
     gamethread.start()
-
-    #def userCheck():
-        
-        #if 'username' in session:
-        #    return f'Logged in as {session["username"]}'
-        #return 'You are not logged in'
+    def userCheck():
+        if 'username' in session:
+            return session['username']
+        return None
 
     # a simple page that says hello
-    @app.route('/index.html')
+    @app.route('/index')
     def index():
-        #userCheck()
         return render_template("index.html")
     @app.route('/user/login', methods=['POST','GET'])
     def login():
         if request.method == "POST":
-            session['username'] = request.form['username']
-            return redirect("room/join.html")
+            user = db.users.find_one({'name':request.form['username']})
+            if(user!=None):
+                session['username'] = request.form['username']
+                users[request.form['username']] = user
+                print(session) # TODO delete this 
+                return redirect("../room/join")
         return render_template("user/login.html")
     @app.route('/user/logout')
     def logout():
+        username = userCheck()
         session.pop('username', None)
+        if username in users:
+            users.pop(username)
+        return redirect("../index")
     @app.route('/user/register', methods=['POST','GET'])
     def reg():
-        #userCheck()
         if request.method == "POST":
-            #Proccses reg data
-            return "Succses"
-        
+            user = db.users.find_one({'name':request.form['username']})
+            if(user==None):
+                db.users.insert_one({'name':request.form['username'],'points':0})
+                return redirect("/user/login")
         return render_template("user/register.html")
 
-    @app.route('/user/view.html')
+    @app.route('/user/view')
     def usrview():
-        #userCheck()
-        return render_template("user/view.html", user=users[0])
-    
-    @app.route('/user/edit.html')
-    def usredit():
-        #userCheck()
-        return render_template("user/edit.html",user=users[0])
+        username = userCheck()
+        user = db.users.find_one({'name':username})
+        if(user!=None):
+            return render_template("user/view.html", user=user)
+        else:
+            return logout()
 
-    @app.route('/roomlist.html')
+    @app.route('/roomlist')
     def roomlist():
         #userCheck()
         return render_template("/roomlist.html")

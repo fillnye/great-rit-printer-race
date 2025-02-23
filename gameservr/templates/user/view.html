@@ -1,12 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User View</title>
-</head>
-<body>
-    <h2>Username</h2>
+{% extends 'base.html' %}
+
+{% block header %}
+{% block title %}View{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div>
+    <h3>Username</h3>
     {{ user.name }}
-    <h2>Score</h2>
+    <h3>Score</h3>
     {{ user.points }}
-</body>
-</html>
+</div>
+{% endblock %}
