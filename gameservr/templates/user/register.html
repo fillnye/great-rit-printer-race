@@ -4,12 +4,9 @@
 {% block title %}User Registration{% endblock %}
 {% endblock %}
 {% block content %}
-    <form action="/user/register.html" method="post">
+    <form action="/user/register" method="post">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
         <br>
         <button type="submit">Register</button>
     </form>
