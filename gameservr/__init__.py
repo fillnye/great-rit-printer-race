@@ -111,9 +111,11 @@ def create_app(test_config=None):
     users = {}
     roomone = Room(users,0)
 
+    print("FF")
     gamethread = threading.Thread(target=roomone.mainLoop)
 
     gamethread.start()
+
     def userCheck():
         if 'username' in session:
             return session['username']
@@ -170,7 +172,7 @@ def create_app(test_config=None):
         if(user==None):
             return logout()
         if(roomone.status==Status.STARTING or roomone.status==Status.INTERROUND):
-            return render_template("/room/start.html",timeleft=roomone.timeleft,round=roomone.round,room=roomid)
+            return render_template("/room/join.html",timeleft=roomone.timeleft,round=roomone.round,room=roomid)
         elif(roomone.status==Status.INROUND):
             return render_template("/room/room.html",timeleft=roomone.timeleft,round=roomone.round,room=roomid)
         elif(roomone.status==Status.END):
