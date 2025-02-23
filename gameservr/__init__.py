@@ -13,7 +13,6 @@ import string
 import threading
 import json
 
-
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -54,8 +53,8 @@ class Room:
         self.round = 0
         self.status = Status.STARTING
         self.winner = "No One"
-        self.timeleft = 0;
-        self.round = 0;
+        self.timeleft = 0
+        self.round = 0
 
     def mainLoop(self):
         while(self.status!=Status.FAULT):
