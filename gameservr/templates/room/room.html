@@ -1,45 +1,83 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>GREAT RIT PRINTER RACE</title>
-        <meta http-equiv="refresh" content="1">
-    </head>
-    <body>
-        <div id="Information" style="text-align: left">
-         <h3>Round Info</h3>
+{% extends 'base.html' %}
+
+{% block title %}Game{% endblock %}
+
+{% block noscript %}
+        <noscript>
+        <meta id="refresh" http-equiv="refresh" content="5">
+        </noscript>
+{% endblock %}
+
+{% block content %}
+        <h1>Find the Paper</h1>
+        <p>Look around the school to find which printer printed the code</p>
+        <div class="information">
           <table>
             <tr>
-              <th>Room</th>
+
               <td>{{ room }}</td>
+                <td>{{ round }}</td>
+                <td id="timeleft">{{ timeleft }}</td>
+                <td id="numplayers">{{users|length}}</td>
             </tr>
             <tr>
-               <th>Round</th>
-               <td>{{ round }}</td>
+                <th>Room</th>
+               <th>Past Rounds</th>
+                <th>Sec. Remaning</th>
+                <th><div class="tooltip">Num of Players
+                        <span class="tooltiptext"> <div>
+         <h3>Player List:</h3>
+            <ul id="playerlist">
+         {% for i in users %}
+
+            <li>{{ i }}</li>
+
+        {% endfor %}
+            </ul>
+        </div> </span>
+                 </div> </th>
             </tr>
-            <tr>
-               <th>Time Remaning</th>
-               <td>{{ timeleft }} seconds</td>
-            </tr>
-            <tr>
-               <th>Num of Players</th>
-               <td>22</td>
-            </tr>
-          </table> 
-        </div>   
-        <div id="playerlist">
-         <h3>Player List</h3>
-         <ul>
-           <li>Coffee</li>
-           <li>Tea</li>
-           <li>Milk</li>
-         </ul> 
+          </table>
         </div>
+         <br>
+        {% if isFail %}
+        <div>
+        <span class="error">Incorrect Code</span>
+        </div>
+        {% endif %}
+
         <div id="codeform" style="display:inline-block">
             <form method="post" target="_self" action="/room/{{ room }}/challenge"> <!-- chnage in templete -->
             <label for="code">Enter Code from Paper:</label><br>
             <input type="text" id="code" name="code"><br>
-            <input type="submit" value="Submit">
+                <div class="button">
+            <button type="submit" value="Submit">Submit</button>
+                </div>
             </form>
-        </div>
-    </body>
-</html>
+        <script>
+              let time = {{ timeleft }};
+              let players = {{ users|safe }}
+                setInterval(function () {
+                    time--;
+                    if(time<=0){
+                       window.location.reload();
+                    }
+                    document.getElementById("timeleft").innerText = time;
+
+                }, 1000);
+                setInterval(function () {
+                   fetch('/room/{{ room }}/status', {method: 'GET'}).then((response) => {response.json().then((jsonResponse) => {
+                        if(jsonResponse.status!=1){
+                            window.location.reload();
+                        }
+                        time = jsonResponse.time;
+                        players = JSON.parse(jsonResponse.users);
+                        console.log(typeof players);
+                        document.getElementById("numplayers").innerText =  players.length;
+                        document.getElementById('playerlist').innerHTML = players.map((user) => {
+                                return `<li>${ user }</li>`;
+                        }).join('');
+                    }); });
+                }, 10000);
+         </script>
+{% endblock %}

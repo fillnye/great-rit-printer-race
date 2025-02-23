@@ -4,10 +4,17 @@
 {% block title %}User Registration{% endblock %}
 {% endblock %}
 {% block content %}
+    <h1>Register</h1>
+    {% if fail %}
+        <div>
+        <span class="error">Username already exist</span>
+        </div>
+    {% endif %}
     <form action="/user/register" method="post">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
-        <br>
+        <div class="button">
         <button type="submit">Register</button>
+        </div>
     </form>
 {% endblock %}

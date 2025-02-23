@@ -1,19 +1,27 @@
 <!DOCTYPE html>
-<title>{% block title %}{% endblock %} - Great RIT Printer Race</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<head>
+    <title>{% block title %}{% endblock %} - Great RIT Printer Race</title>
+    {% block noscript %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+<div class="top">
+    <div class="viewbox">
+    <img src="{{ url_for('static', filename='iconforserver2.png') }}">
+        </div>
 <div class="header">
-    <h1>
-        Great RIT Printer Race - {% block header %}{% endblock %}
+    <a id="main" href="/"><h1>
+        Great RIT Printer Race
     </h1>
+    </a>
     <h2>
-      <a href="/user/view">Profile</a>
-      <a href="/room/join">Rooms</a>
+      <a href="/room/list">Rooms</a>
       <a href="/user/logout">Logout</a>
     </h2>
 </div>
-<section class="content">
-    <header>
-      
-    </header>
+</div>
+<div class="maincontent">
     {% block content %}{% endblock %}
-  </section>
+</div>
+</body>

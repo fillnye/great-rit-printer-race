@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Room List{% endblock %}
+
+{% block noscript %}
+        <noscript>
+        <meta id="refresh" http-equiv="refresh" content="5">
+        </noscript>
+{% endblock %}
+
+{% block content %}
+        <h1>Room List</h1>
+        <h2>Please select room you wish to play in</h2>
+        <div id=roomlist class="roomlist">
+            <table id="roomtable">
+            <tr>
+                <th>Room</th>
+                <th>Round</th>
+                <th>Players</th>
+                <th>Status</th>
+                <th>Time</th>
+            </tr>
+            {% for room in rooms %}
+                
+               <tr>
+                <td class="notstatusword"> <a href="/room/{{loop.index0}}"> {{ loop.index0 }} </a></td>
+                <td class="notstatusword">{{ room.round }}</td>
+                <td class="notstatusword">{{ room.users|length}}</td>
+                <td class="statusword">{{ room.status.name|lower}}</td>
+                <td class="notstatusword">{{ room.timeleft }}</td>
+               </tr>
+            {% endfor %}
+            </table>
+        </div>
+        <script>
+            let rooms = {{ roomjson|safe }};
+                console.log(rooms);
+                setInterval(function () {
+                  for(var i=0;i<rooms.length;i++){
+                    rooms[i].time--
+                    if(rooms[i].time<0){
+                        fetch('/room/list/upd', {method: 'GET'}).then((response) => {response.json().then((jsonResponse) => {
+                        rooms = jsonResponse
+
+                for(var i=0;i<rooms.length;i++){
+                    var x = document.getElementById("roomtable").rows[i+1].cells;
+                    x[0].innerHTML = `<a href="/room/${i}">${i}</a>`
+                    x[1].innerHTML = rooms[i].round
+                    x[2].innerHTML = rooms[i].players
+                    x[3].innerHTML = rooms[i].status
+                    x[4].innerHTML = rooms[i].time
+                  }  }); });
+                        break;
+                    }
+                    var x = document.getElementById("roomtable").rows[i+1].cells;
+                    x[4].innerHTML = rooms[i].time
+                  }
+
+                }, 1000);
+                setInterval(function () {
+                   fetch('/room/list/upd', {method: 'GET'}).then((response) => {response.json().then((jsonResponse) => {
+                        rooms = jsonResponse
+
+                for(var i=0;i<rooms.length;i++){
+                    var x = document.getElementById("roomtable").rows[i+1].cells;
+                    x[0].innerHTML = `<a href="/room/${i}">${i}</a>`
+                    x[1].innerHTML = rooms[i].round
+                    x[2].innerHTML = rooms[i].players
+                    x[3].innerHTML = rooms[i].status
+                    x[4].innerHTML = rooms[i].time
+                  }  }); });
+                }, 10000);
+        </script>
+{% endblock %}
