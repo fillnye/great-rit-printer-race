@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Room Round Ended</title>
+        <meta http-equiv="refresh" content="1">
+    </head>
+    <body>
+        <h1>Game has Ended</h1>
+        <h3>{{ winner }} has succsesfully found the printer</h3>
+        <p>Please stand by if you wish to play again, otherwise leave now</p>
+        <div id="Information" style="text-align: left">
+         <h3>Room Info</h3>
+          <table>
+            <tr>
+              <th>Room</th>
+              <td>{{ room }}</td>
+            </tr>
+            <tr>
+               <th>Past Rounds</th>
+               <td>{{ round }}</td>
+            </tr>
+            <tr>
+               <th>Waiting Time</th>
+               <td>{{ timeleft }} seconds remaining</td>
+            </tr>
+            <tr>
+               <th>Num of Players</th>
+               <td>22</td>
+            </tr>
+          </table> 
+        </div> 
+        <div id="playerlist">
+         <h3>Player List</h3>
+         <ul>
+           <li>Coffee</li>
+           <li>Tea</li>
+           <li>Milk</li>
+         </ul> 
+        </div>
+        <a href="/"> Leave Room </a>
+    </body>
+</html>

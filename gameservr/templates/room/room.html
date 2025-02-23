@@ -2,8 +2,44 @@
 <html>
     <head>
         <title>GREAT RIT PRINTER RACE</title>
+        <meta http-equiv="refresh" content="1">
     </head>
     <body>
-        ROOM SHOULD BE HERE
+        <div id="Information" style="text-align: left">
+         <h3>Round Info</h3>
+          <table>
+            <tr>
+              <th>Room</th>
+              <td>{{ room }}</td>
+            </tr>
+            <tr>
+               <th>Round</th>
+               <td>{{ round }}</td>
+            </tr>
+            <tr>
+               <th>Time Remaning</th>
+               <td>{{ timeleft }} seconds</td>
+            </tr>
+            <tr>
+               <th>Num of Players</th>
+               <td>22</td>
+            </tr>
+          </table> 
+        </div>   
+        <div id="playerlist">
+         <h3>Player List</h3>
+         <ul>
+           <li>Coffee</li>
+           <li>Tea</li>
+           <li>Milk</li>
+         </ul> 
+        </div>
+        <div id="codeform" style="display:inline-block">
+            <form method="post" target="_self" action="/room/{{ room }}/challenge"> <!-- chnage in templete -->
+            <label for="code">Enter Code from Paper:</label><br>
+            <input type="text" id="code" name="code"><br>
+            <input type="submit" value="Submit">
+            </form>
+        </div>
     </body>
 </html>
