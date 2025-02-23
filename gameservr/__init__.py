@@ -52,8 +52,7 @@ class Room:
         self.challengecode = "0"
         self.round = 0
         self.status = Status.STARTING
-        self.winner = -1
-        self.timeleft = 0
+        self.winner = "No One"
 
     def mainLoop(self):
         while(self.status!=Status.FAULT):
@@ -94,7 +93,7 @@ class Room:
         if(challengecode==self.challengecode):
             self.status = Status.END
             user.points+=10
-            self.winner = user.id
+            self.winner = user.name
             return True
         else:
             return False
@@ -164,7 +163,7 @@ def create_app(test_config=None):
         elif(roomone.status==Status.INROUND):
             return render_template("/room/room.html")
         elif(roomone.status==Status.END):
-            return render_template("/room/end.html")
+            return render_template("/room/end.html",winner=roomone.winner)
         
         return Response("Internal Server Error", status=500)
 

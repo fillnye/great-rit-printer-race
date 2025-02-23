@@ -1,11 +1,39 @@
-{% extends 'base.html' %}
-{% extends 'header.html' %}
 <!DOCTYPE html>
 <html>
     <head>
         <title>Join Room</title>
     </head>
     <body>
-        JOIN ROOM
+        <h1>Standybye, Waiting for the Game to Start</h1>
+        <div id="Information" style="text-align: left">
+         <h3>Room Info</h3>
+          <table>
+            <tr>
+              <th>Room</th>
+              <td>1</td>
+            </tr>
+            <tr>
+               <th>Past Rounds</th>
+               <td>1</td>
+            </tr>
+            <tr>
+               <th>Waiting Time</th>
+               <td>40 seconds remaining</td>
+            </tr>
+            <tr>
+               <th>Num of Players</th>
+               <td>22</td>
+            </tr>
+          </table> 
+        </div> 
+        <div id="playerlist">
+         <h3>Player List</h3>
+         <ul>
+           <li>Coffee</li>
+           <li>Tea</li>
+           <li>Milk</li>
+         </ul> 
+        </div>
+        <a href="/"> Leave Room </a>
     </body>
 </html>
