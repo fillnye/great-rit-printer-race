@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Join Room</title>
+        <title>Room Round Ended</title>
+        <meta http-equiv="refresh" content="1">
     </head>
     <body>
         <h1>Game has Ended</h1>
@@ -12,15 +13,15 @@
           <table>
             <tr>
               <th>Room</th>
-              <td>1</td>
+              <td>{{ room }}</td>
             </tr>
             <tr>
                <th>Past Rounds</th>
-               <td>1</td>
+               <td>{{ round }}</td>
             </tr>
             <tr>
                <th>Waiting Time</th>
-               <td>40 seconds remaining</td>
+               <td>{{ timeleft }} seconds remaining</td>
             </tr>
             <tr>
                <th>Num of Players</th>

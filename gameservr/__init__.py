@@ -12,7 +12,7 @@ import random
 import string
 import threading
 import json 
-from flask_pymongo import PyMongo
+#from flask_pymongo import PyMongo
 
 #from pymongo.mongo_client import MongoClient
 #from pymongo.server_api import ServerApi
@@ -53,6 +53,8 @@ class Room:
         self.round = 0
         self.status = Status.STARTING
         self.winner = "No One"
+        self.timeleft = 0;
+        self.round = 0;
 
     def mainLoop(self):
         while(self.status!=Status.FAULT):
@@ -60,40 +62,43 @@ class Room:
                 self.startRound()
             elif(self.status==Status.INTERROUND):
                 self.startRound()
-            elif(self.status==Status.INROUND):
+                print("e")
+            elif(self.  status==Status.INROUND):
                 self.timeleft = 600
-                for i in range(600):
+                print("o")
+                self.winner="No One"
+                while(self.timeleft>0):
                     time.sleep(1)
                     self.timeleft -= 1
                     if(self.status==Status.END):
-                        continue
-                self.winner=-1
+                        break                
+                self.timeleft = 30                
                 self.status=Status.END
             elif(self.status==Status.END):
-                self.timeleft = 30
-                for i in range(30):
+                while(self.timeleft>0):
                     time.sleep(1)
                     self.timeleft -= 1
-                self.startRound()
+                self.status=Status.INTERROUND
             
     def startRound(self):
         if(len(self.users)<1):
             print("NOT ENOUGH USERS TO START")
             self.timeleft = 10
-            for i in range(10):
+            while(self.timeleft>0):
                 time.sleep(1)
                 self.timeleft -= 1
             return
         self.challengecode = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         self.printcode()
+        self.round+=1
         self.status = Status.INROUND
     def printcode(self):
         print(self.challengecode)
     def challenge(self,challengecode,user):
         if(challengecode==self.challengecode):
-            self.status = Status.END
             user.points+=10
             self.winner = user.name
+            self.status = Status.END
             return True
         else:
             return False
@@ -103,8 +108,8 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-    app.config["MONGO_URI"] = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
-    mongo = PyMongo(app)
+    #app.config["MONGO_URI"] = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
+    #mongo = PyMongo(app)
     users=[User("Bob",32,500),User("Bob2",33,500),User("Bil",35,510)]
     roomone = Room(users,0)
 
@@ -112,15 +117,16 @@ def create_app(test_config=None):
 
     gamethread.start()
 
-    def userCheck():
-        if 'username' in session:
-            return f'Logged in as {session["username"]}'
-        return 'You are not logged in'
+    #def userCheck():
+        
+        #if 'username' in session:
+        #    return f'Logged in as {session["username"]}'
+        #return 'You are not logged in'
 
     # a simple page that says hello
     @app.route('/index.html')
     def index():
-        userCheck()
+        #userCheck()
         return render_template("index.html")
     @app.route('/user/login', methods=['POST','GET'])
     def login():
@@ -133,7 +139,7 @@ def create_app(test_config=None):
         session.pop('username', None)
     @app.route('/user/register', methods=['POST','GET'])
     def reg():
-        userCheck()
+        #userCheck()
         if request.method == "POST":
             #Proccses reg data
             return "Succses"
@@ -142,28 +148,28 @@ def create_app(test_config=None):
 
     @app.route('/user/view.html')
     def usrview():
-        userCheck()
+        #userCheck()
         return render_template("user/view.html", user=users[0])
     
     @app.route('/user/edit.html')
     def usredit():
-        userCheck()
+        #userCheck()
         return render_template("user/edit.html",user=users[0])
 
     @app.route('/roomlist.html')
     def roomlist():
-        userCheck()
+        #userCheck()
         return render_template("/roomlist.html")
 
     @app.route('/room/<int:roomid>')
     def room(roomid):
-        userCheck()
+        #userCheck()
         if(roomone.status==Status.STARTING or roomone.status==Status.INTERROUND):
-            return render_template("/room/start.html")
+            return render_template("/room/start.html",timeleft=roomone.timeleft,round=roomone.round,room=roomid)
         elif(roomone.status==Status.INROUND):
-            return render_template("/room/room.html")
+            return render_template("/room/room.html",timeleft=roomone.timeleft,round=roomone.round,room=roomid)
         elif(roomone.status==Status.END):
-            return render_template("/room/end.html",winner=roomone.winner)
+            return render_template("/room/end.html",winner=roomone.winner,timeleft=roomone.timeleft,round=roomone.round,room=roomid)
         
         return Response("Internal Server Error", status=500)
 
@@ -177,6 +183,7 @@ def create_app(test_config=None):
     def roomchlg(roomid):
         if request.method == "POST":
             if(('code' in request.form) and roomone.challenge(request.form['code'],roomone.users[0])):
+                roomone.timeleft = 30
                 return redirect('/room/'+str(roomid)) 
             else:
                 return redirect('/room/'+str(roomid)+"?fail=true")

@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>GREAT RIT PRINTER RACE</title>
+        <meta http-equiv="refresh" content="1">
     </head>
     <body>
         <div id="Information" style="text-align: left">
@@ -9,15 +10,15 @@
           <table>
             <tr>
               <th>Room</th>
-              <td>1</td>
+              <td>{{ room }}</td>
             </tr>
             <tr>
                <th>Round</th>
-               <td>1</td>
+               <td>{{ round }}</td>
             </tr>
             <tr>
                <th>Time Remaning</th>
-               <td>40 seconds</td>
+               <td>{{ timeleft }} seconds</td>
             </tr>
             <tr>
                <th>Num of Players</th>
@@ -34,7 +35,7 @@
          </ul> 
         </div>
         <div id="codeform" style="display:inline-block">
-            <form method="post" target="_self" action="/room/1/challenge"> <!-- chnage in templete -->
+            <form method="post" target="_self" action="/room/{{ room }}/challenge"> <!-- chnage in templete -->
             <label for="code">Enter Code from Paper:</label><br>
             <input type="text" id="code" name="code"><br>
             <input type="submit" value="Submit">
