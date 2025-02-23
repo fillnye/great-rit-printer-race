@@ -227,3 +227,9 @@ ul {
     font-size:20px;
 }
 
+.userinfo {
+    display:inline-block;
+    float: right;
+    margin-right:30px;
+    font-weight:normal;
+}

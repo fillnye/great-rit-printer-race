@@ -198,7 +198,7 @@ def create_app(test_config=None):
             data.append({"round": room.round, "players": len(room.users), "status": room.status.name.lower(),
                          "time": room.timeleft})
         roomjson =  json.dumps(data)
-        return render_template("/room/list.html",rooms=rooms, roomjson=roomjson)
+        return render_template("/room/list.html",rooms=rooms, roomjson=roomjson, user=user)
 
     @app.route('/room/list/upd')
     def roomlistupd():
@@ -231,13 +231,13 @@ def create_app(test_config=None):
         else:
             rooms[roomid].timeout[rooms[roomid].users.index(username)] = time.time()
         if(rooms[roomid].status==Status.STARTING or rooms[roomid].status==Status.INTERROUND):
-            return render_template("/room/join.html",timeleft=rooms[roomid].timeleft,round=rooms[roomid].round,room=roomid,users=rooms[roomid].users)
+            return render_template("/room/join.html",timeleft=rooms[roomid].timeleft,round=rooms[roomid].round,room=roomid,users=rooms[roomid].users,user=user)
         elif(rooms[roomid].status==Status.INROUND):
             fail = request.args.get('fail')
             isFail = not (fail is None)
-            return render_template("/room/room.html",timeleft=rooms[roomid].timeleft,round=rooms[roomid].round,room=roomid,users=rooms[roomid].users,isFail=isFail)
+            return render_template("/room/room.html",timeleft=rooms[roomid].timeleft,round=rooms[roomid].round,room=roomid,users=rooms[roomid].users,isFail=isFail,user=user)
         elif(rooms[roomid].status==Status.END):
-            return render_template("/room/end.html",winner=rooms[roomid].winner,timeleft=rooms[roomid].timeleft,round=rooms[roomid].round,room=roomid,users=rooms[roomid].users)
+            return render_template("/room/end.html",winner=rooms[roomid].winner,timeleft=rooms[roomid].timeleft,round=rooms[roomid].round,room=roomid,users=rooms[roomid].users,user=user)
         
         return Response("Internal Server Error", status=500)
 

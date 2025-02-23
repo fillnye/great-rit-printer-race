@@ -20,6 +20,7 @@
       <a href="/user/logout">Logout</a>
     </h2>
 </div>
+    <div class="userinfo">{% if user %}<h3 style="font-weight:normal;">{{ user.name }} ({{ user.points }} Points)</h3>{% endif %}</div>
 </div>
 <div class="maincontent">
     {% block content %}{% endblock %}
