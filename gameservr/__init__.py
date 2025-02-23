@@ -47,7 +47,7 @@ class User:
 
 class Room:
     def __init__(self, users, age):
-        self.users = users
+        self.users = users.keys()
         self.age = age
         self.challengecode = "0"
         self.round = 0
@@ -165,7 +165,10 @@ def create_app(test_config=None):
 
     @app.route('/room/<int:roomid>')
     def room(roomid):
-        #userCheck()
+        username = userCheck()
+        user = db.users.find_one({'name':username})
+        if(user==None):
+            return logout()
         if(roomone.status==Status.STARTING or roomone.status==Status.INTERROUND):
             return render_template("/room/start.html",timeleft=roomone.timeleft,round=roomone.round,room=roomid)
         elif(roomone.status==Status.INROUND):
@@ -177,12 +180,20 @@ def create_app(test_config=None):
 
     @app.route('/room/<int:roomid>/status')
     def roomstat(roomid):
+        username = userCheck()
+        user = db.users.find_one({'name':username})
+        if(user==None):
+            return logout()
         userjson = json.dumps(users, default=lambda o: o.__dict__)
         data = {'users':userjson,'status':int(roomone.status.value), 'time':roomone.timeleft }
         return data
 
     @app.route('/room/<int:roomid>/challenge', methods=['POST'])
     def roomchlg(roomid):
+        username = userCheck()
+        user = db.users.find_one({'name':username})
+        if(user==None):
+            return logout()
         if request.method == "POST":
             if(('code' in request.form) and roomone.challenge(request.form['code'],roomone.users[0])):
                 roomone.timeleft = 30
