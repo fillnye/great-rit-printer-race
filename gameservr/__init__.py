@@ -99,9 +99,10 @@ class Room:
     def printcode(self, ):
         printers = list(self.cupsconn.getPrinters().keys())
         printer = printers[random.randint(0,len(printers)-1)]
-        #lpr = subprocess.Popen("/usr/bin/lpr -P"+printer,  stdin=subprocess.PIPE)
-        #lpr.stdin.write(str.encode("RIT GREAT PRINTER GAMES CODE:" + self.challengecode))
-        print(self.challengecode)
+        lpr = subprocess.Popen(["/usr/bin/lpr", "-P", printer],  stdin=subprocess.PIPE)
+        print(str.encode("RIT GREAT PRINTER GAMES CODE:" + self.challengecode))
+        lpr.stdin.write(str.encode("RIT GREAT PRINTER GAMES CODE:" + self.challengecode + "\n"))
+        lpr.stdin.close()
     def challenge(self,challengecode,user,users):
         if(challengecode==self.challengecode):
             users[user]['points']+=10
