@@ -18,7 +18,7 @@ import subprocess
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-uri = "mongodb+srv://gjl1803:gYJg69YkajZzqh7D@greatritprinterrace.yqz1e.mongodb.net/?retryWrites=true&w=majority&appName=GreatRITPrinterRace"
+uri = "REDACTED"
 
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
